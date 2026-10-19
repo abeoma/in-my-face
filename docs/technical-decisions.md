@@ -1,6 +1,8 @@
 # 技術判断（ADR）
 
-確認日：2026-10-15。Apple公式資料で確認できたAPIの意味と、本プロジェクトの採用方針を区別します。実機検証は未実施です。「採用」は設計上の判断であり、実装完了を意味しません。
+確認日：2026-10-15。Apple公式資料で確認できたAPIの意味と、本プロジェクトの採用方針を区別します。製品のOS連携の実機検証は未実施です。「採用」は設計上の判断であり、実装完了を意味しません。
+
+2026-10-19追記：EventKit検証アプリのビルド・初期画面を確認しました。[検証記録](validation/eventkit-probe.md)を参照してください。権限許可後の取得やOS連携の実機検証は未実施です。
 
 ## ADR-01：SwiftとネイティブUI
 
@@ -18,6 +20,7 @@
 - 代替：独自OAuth/API同期はネットワークと秘密情報管理を増やすため不採用。カレンダーDB直接参照も不採用。
 - トレードオフ：OSの同期遅延と利用者の許可に依存する。変更通知には個別差分がないため再取得し、古いオブジェクトを使わない。[Apple：変更通知](https://developer.apple.com/documentation/eventkit/ekeventstorechangednotification)
 - 検証：Sandboxを有効にする場合はCalendars entitlementを含め、署名済みアプリで許可・拒否・撤回を確認する。[Apple：Calendars entitlement](https://developer.apple.com/documentation/bundleresources/entitlements/com.apple.security.personal-information.calendars)
+- 検証構成（2026-10-19）：独立した試作でFull Access要求、全権限状態の表示、明示選択したカレンダーの期間検索、変更時の再取得を実装。App SandboxとCalendars entitlementを有効化。TN3152本文とSDKヘッダーでAPI・Usage Descriptionを再確認。権限ダイアログと許可後の挙動は未確認。
 
 ## ADR-03：公開APIのオーバーレイと表示保証の境界
 
@@ -54,6 +57,7 @@
 - 判断：XcodeのmacOSアプリターゲットを主体にする。XCTestで純粋ロジックと永続化を検証し、OS表示挙動は実機で補う。SPMは必要時のみ追加。
 - 代替：Swift Testingも候補だが、初期はUIテストと同じツール群のXCTestへ統一。SPM単独ではアプリ署名・entitlements・配布を別途管理する必要がある。
 - トレードオフ：Xcode版の固定とmacOS実機が必要。コードカバレッジ率の数値だけを合格基準にせず、境界条件と要件IDの検証を優先する。
+- P0の開発基準（2026-10-19）：Xcode 27.1（27A9275）、同梱Swift 6.4、macOS SDK 27.0。`.xcode-version`でXcode版を記録し、同梱`swift-format`を整形・スタイル確認に使用する（設定は`.swift-format`）。外部リンターは導入しない。Deployment Targetは14.0の暫定値。Ad Hoc署名でビルド可能だが、Apple Development署名での権限検証は別途必要。
 
 ## 実装前に確定する事項
 
