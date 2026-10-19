@@ -17,6 +17,8 @@ MVPに向けた技術検証・実装の順序と、各段階の完了条件を�
 
 EventKit検証アプリは`Prototypes/EventKitProbe/`にあります。[検証手順・結果](validation/eventkit-probe.md)にビルドと初期画面の確認結果を記録しています。Full Access許可後の取得・拒否・撤回・繰り返し識別子の検証は未実施です。P0全体は未完了です。
 
+オーバーレイ検証アプリは`Prototypes/OverlayProbe/`にあります。[表示検証記録](validation/overlay-probe.md)に構成別の実測範囲と手順を記載しています。画面着脱・複数画面・Stage Manager・VoiceOver・対応最小OSでの検証は未実施です。EventKitの権限試験とは独立して進めます。
+
 - EventKit：未決定・fullAccess・拒否・制限・writeOnly、OS設定での撤回と再許可。変更通知後の再取得、iCloud等の同期遅延を観測する。
 - 回の識別：単発の時刻変更、シリーズ全体編集、1回のみ変更・削除、カレンダー移動、アカウント再同期で識別子とoccurrenceDateの安定性を確認する。個人情報を除いた試験データを使う。
 - 表示：対応最小OSと採用する最新安定OS、通常・別Space・他アプリフルスクリーン・Stage Manager、単一／複数画面、画面ごとの個別SpaceのON/OFFを組み合わせる。フォーカス、Esc、VoiceOver、画面着脱、メニューバーからの停止・終了を確認する。
