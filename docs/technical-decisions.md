@@ -33,6 +33,8 @@
 - 保証しない挙動：ロック・ログイン画面、スクリーンセーバー、他の高レベルウィンドウ、排他的表示中のアプリの上への強制表示。Space移動中、Stage Manager、画面ごとに個別Spaceを使う構成の結果は未確認。これらは現時点の対応保証から除外する判断であり、すべてで表示不可能と断定するものではない。
 - 代替：通常通知は要件を満たさない。非公開API、Accessibilityによる操作強制、画面収録、システム用levelの流用は不採用。
 - トレードオフ：安全性と利用者の制御を優先するため全面保証はできない。実機で失敗した表示構成は既知制限として公開し、必要なら対象OSまたはMVP要件を見直す。
+- 検証構成（2026-10-20）：`Prototypes/OverlayProbe/`でborderless・nonactivatingのNSPanelを画面ごとに作り、levelはfloatingとする。`canJoinAllSpaces + fullScreenAuxiliary`と`canJoinAllSpaces + canJoinAllApplications`を別構成として比較する。後者はApple公式資料とXcode 27.1のSDKヘッダーでmacOS 13以降のAPIと確認した。`primary`・`auxiliary`との排他条件を守り、製品の採用構成はまだ確定しない。
+- 検証結果と制限：[表示検証記録](validation/overlay-probe.md)。通常デスクトップで2構成の表示とEsc・Dismiss、自動停止を確認。フルスクリーンの他アプリ稼働中にもパネル生成・画面取得を確認したが、前面表示の一般保証には使わない。画面構成変更は[didChangeScreenParametersNotification](https://developer.apple.com/documentation/appkit/nsapplication/didchangescreenparametersnotification)、ユーザー切替は[sessionDidResignActiveNotification](https://developer.apple.com/documentation/appkit/nsworkspace/sessiondidresignactivenotification)を用いる（確認日：2026-10-20）。後者はセッション切替通知であり、ロック検出と同一視しない。
 
 ## ADR-04：ローカルスケジューラーと回ごとの台帳
 

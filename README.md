@@ -20,7 +20,7 @@
 
 ## 開発ステータス
 
-P0の技術検証段階です。`Prototypes/EventKitProbe/`に、カレンダー権限・選択日の予定・繰り返し回の識別情報を確認するmacOSアプリがあります。製品のメニューバー・通知・Join・永続化は未実装です。
+P0の技術検証段階です。`Prototypes/EventKitProbe/`にカレンダー権限・選択日の予定・繰り返し回の識別情報を確認するアプリ、`Prototypes/OverlayProbe/`に画面ごとの表示を確認するアプリがあります。製品のメニューバー・通知・Join・永続化は未実装です。
 
 ## 検証アプリのビルドと起動
 
@@ -43,6 +43,18 @@ git diff --check
 ```
 
 整形は同じコマンドの`lint --strict`を`format --in-place`へ変更します。XCTestターゲットは未作成です。
+
+## オーバーレイ検証アプリ
+
+```sh
+xcodebuild -project Prototypes/OverlayProbe/OverlayProbe.xcodeproj \
+  -scheme OverlayProbe -configuration Debug \
+  -derivedDataPath .build/OverlayProbe build
+open .build/OverlayProbe/Build/Products/Debug/OverlayProbe.app
+xcrun swift-format lint --strict --recursive Prototypes/OverlayProbe/Sources
+```
+
+カレンダー権限なしで固定サンプルを表示します。設定画面で表示構成を選び「3秒後に表示」を押すと、画面ごとにNSPanelを作ります。Esc・Dismissで全パネルを閉じ、15秒で自動停止します。メニューバーから検証画面の再表示・停止・終了ができます。手順と確認範囲は[オーバーレイ検証記録](docs/validation/overlay-probe.md)を参照してください。
 
 ## ドキュメント
 
