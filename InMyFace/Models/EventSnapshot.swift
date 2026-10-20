@@ -22,3 +22,16 @@ struct EventSnapshot: Identifiable, Equatable, Sendable {
     var reminderDate: Date { start.addingTimeInterval(-60) }
     var displayTitle: String { title.isEmpty ? "名称未設定" : title }
 }
+
+/// 独立した停止理由を、対応する復帰通知だけで解除する。
+struct SuspensionState {
+    enum Reason: Hashable {
+        case systemSleep, displaySleep, inactiveSession, shutdown
+    }
+
+    private var reasons: Set<Reason> = []
+    var isSuspended: Bool { !reasons.isEmpty }
+
+    mutating func suspend(_ reason: Reason) { reasons.insert(reason) }
+    mutating func resume(_ reason: Reason) { reasons.remove(reason) }
+}

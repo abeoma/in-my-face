@@ -4,6 +4,31 @@ import XCTest
 final class ReminderSchedulerTests: XCTestCase {
     private let now = Date(timeIntervalSince1970: 1_700_000_000)
 
+    func testDisplayWakeDoesNotResumeAnInactiveSession() {
+        var state = SuspensionState()
+        state.suspend(.inactiveSession)
+        state.suspend(.displaySleep)
+        state.resume(.displaySleep)
+        XCTAssertTrue(state.isSuspended)
+        state.resume(.inactiveSession)
+        XCTAssertFalse(state.isSuspended)
+    }
+
+    func testSystemWakeStillWaitsForDisplayWakeAndShutdownCannotResume() {
+        var state = SuspensionState()
+        state.suspend(.systemSleep)
+        state.suspend(.displaySleep)
+        state.resume(.systemSleep)
+        XCTAssertTrue(state.isSuspended)
+        state.resume(.displaySleep)
+        XCTAssertFalse(state.isSuspended)
+        state.suspend(.shutdown)
+        state.resume(.systemSleep)
+        state.resume(.displaySleep)
+        state.resume(.inactiveSession)
+        XCTAssertTrue(state.isSuspended)
+    }
+
     private func event(
         id: String = "meeting", startOffset: TimeInterval = 60, endOffset: TimeInterval = 3600,
         allDay: Bool = false, cancelled: Bool = false, occurrence: Date? = nil

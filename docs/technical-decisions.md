@@ -46,6 +46,8 @@
 - トレードオフ：変更後も同一回を追える範囲ではDismissを維持する。識別子の全面置換やクラッシュ直前では完全な一度限りの保証はできない。類似タイトルの誤統合で必要な通知を失わないことを優先する。
 - 最小実装（2026-10-20）：回キーはカレンダー識別子＋eventIdentifier＋繰り返しのoccurrenceDate（単発はnil）。単発の開始時刻変更は識別子が同じ間は同一回として扱い、繰り返し例外は元日時で区別する。初回観測日時の対応表は追加しない。occurrenceDateの意味は[Apple公式資料](https://developer.apple.com/documentation/eventkit/ekevent/occurrencedate)とSDKヘッダーで再確認した。識別子・元日時が変わるシリーズ編集やカレンダー移動は未検証で、再表示防止の保証対象を広げない。
 - 時刻・ライフサイクル（確認日：2026-10-20）：時計変更は[NSSystemClockDidChange](https://developer.apple.com/documentation/foundation/nsnotification/name-swift.struct/nssystemclockdidchange)、画面スリープは[screensDidSleepNotification](https://developer.apple.com/documentation/appkit/nsworkspace/screensdidsleepnotification)を契機とする。これらはロック状態の完全な判定手段ではない。固定時刻での通知判定・停止・再評価はXCTest、OSの表示・権限は実機で別に確認する。
+- レビュー後の判断（2026-10-20）：[screensDidWakeNotification](https://developer.apple.com/documentation/appkit/nsworkspace/screensdidwakenotification)と[sessionDidBecomeActiveNotification](https://developer.apple.com/documentation/appkit/nsworkspace/sessiondidbecomeactivenotification)は独立した復帰契機であり、画面復帰だけでセッションの停止理由を解除しない。履歴の書き込み失敗は再試行し、起動時の削除もディスクへ反映する。破損バックアップは最大1件・発見後7日までとする。
+- 保留：Dismiss後に現在＋48時間より先へ移動した回は、再取得前に最後に観測した終了＋7日の期限を迎えると履歴を失う。無期限保存は保持方針と矛盾し、全件取得は負荷を増やすため採用しない。対象指定取得の検証は配布前の課題とし、個人利用では再通知時に再Dismissする運用で扱う。REL-02は未合格の範囲を残す。
 
 ## ADR-05：設定・ログイン起動・プライバシー
 

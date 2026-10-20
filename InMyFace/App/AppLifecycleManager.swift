@@ -22,7 +22,8 @@ final class AppLifecycleManager: ObservableObject {
     private var scheduler = ReminderScheduler()
     private var timer: Timer?
     private var subscriptions: Set<AnyCancellable> = []
-    private var isSuspended = false
+    private var suspension = SuspensionState()
+    private var initialHistoryWarning: String?
     private var demoStart = Date().addingTimeInterval(90)
 
     init(isDemo: Bool = false) {
@@ -40,6 +41,7 @@ final class AppLifecycleManager: ObservableObject {
         do { try ledger.load(now: Date()) } catch {
             historyWarning = "履歴を読み込めませんでした。以前閉じた予定が再表示される可能性があります。"
         }
+        initialHistoryWarning = historyWarning
         alerts.onDismiss = { [weak self] in self?.dismiss($0) }
     }
 
@@ -64,18 +66,21 @@ final class AppLifecycleManager: ObservableObject {
             $0.alerts.rebuildPanels()
         }
         let workspace = NSWorkspace.shared.notificationCenter
-        for name in [
-            NSWorkspace.willSleepNotification, NSWorkspace.screensDidSleepNotification,
-            NSWorkspace.sessionDidResignActiveNotification,
-        ] {
-            observe(workspace, name) { $0.suspend() }
-        }
-        for name in [
-            NSWorkspace.didWakeNotification, NSWorkspace.screensDidWakeNotification,
-            NSWorkspace.sessionDidBecomeActiveNotification,
-        ] {
-            observe(workspace, name) {
-                $0.isSuspended = false
+        let transitions: [(Notification.Name, Notification.Name, SuspensionState.Reason)] = [
+            (NSWorkspace.willSleepNotification, NSWorkspace.didWakeNotification, .systemSleep),
+            (
+                NSWorkspace.screensDidSleepNotification, NSWorkspace.screensDidWakeNotification,
+                .displaySleep
+            ),
+            (
+                NSWorkspace.sessionDidResignActiveNotification,
+                NSWorkspace.sessionDidBecomeActiveNotification, .inactiveSession
+            ),
+        ]
+        for (stop, resume, reason) in transitions {
+            observe(workspace, stop) { $0.suspend(reason: reason) }
+            observe(workspace, resume) {
+                $0.suspension.resume(reason)
                 $0.refresh()
             }
         }
@@ -115,7 +120,7 @@ final class AppLifecycleManager: ObservableObject {
         scheduler = ReminderScheduler()
         selectedIDs = ["demo"]
         isPaused = false
-        isSuspended = false
+        suspension = SuspensionState()
         alerts.synchronize([])
         refresh()
     }
@@ -123,7 +128,7 @@ final class AppLifecycleManager: ObservableObject {
     func refresh() {
         timer?.invalidate()
         timer = nil
-        guard !isSuspended else { return }
+        guard !suspension.isSuspended else { return }
         let now = Date()
         if isDemo {
             authorization = .fullAccess
@@ -157,7 +162,10 @@ final class AppLifecycleManager: ObservableObject {
             if previous != selectedIDs { settings.calendarIDs = selectedIDs }
             events = result.events
         }
-        do { try ledger.reconcile(events: events, now: now) } catch {
+        do {
+            try ledger.reconcile(events: events, now: now)
+            historyWarning = initialHistoryWarning
+        } catch {
             historyWarning = "履歴を保存できません。再起動後に再表示される可能性があります。"
         }
         let evaluation = scheduler.evaluate(
@@ -182,7 +190,7 @@ final class AppLifecycleManager: ObservableObject {
     }
 
     func shutdown() {
-        suspend()
+        suspend(reason: .shutdown)
         subscriptions = []
     }
 
@@ -193,8 +201,8 @@ final class AppLifecycleManager: ObservableObject {
         refresh()
     }
 
-    private func suspend() {
-        isSuspended = true
+    private func suspend(reason: SuspensionState.Reason) {
+        suspension.suspend(reason)
         message = "スリープまたはユーザー切替中のため通知を停止しています。"
         timer?.invalidate()
         timer = nil

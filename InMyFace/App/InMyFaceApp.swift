@@ -42,8 +42,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         addItem("In My Faceを終了", action: #selector(quit), key: "q", to: menu)
         item.menu = menu
         statusItem = item
-        model.start()
         showWindow()
+        model.start()
     }
 
     func menuWillOpen(_ menu: NSMenu) {

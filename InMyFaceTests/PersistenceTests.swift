@@ -56,12 +56,70 @@ final class PersistenceTests: XCTestCase {
         XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
     }
 
+    func testOnlyLatestCorruptBackupIsKeptAndExpiresWithoutMainLedger() throws {
+        let url = directory.appendingPathComponent("ledger.json")
+        let store = DismissalStore(url: url)
+        for offset in [0.0, 60.0] {
+            try Data("invalid-json".utf8).write(to: url)
+            XCTAssertThrowsError(try store.load(now: now.addingTimeInterval(offset)))
+        }
+        var files = try FileManager.default.contentsOfDirectory(atPath: directory.path)
+        XCTAssertEqual(files.filter { $0.hasPrefix("dismissed-corrupt-") }.count, 1)
+        try store.load(now: now.addingTimeInterval(8 * 86400))
+        files = try FileManager.default.contentsOfDirectory(atPath: directory.path)
+        XCTAssertTrue(files.isEmpty)
+    }
+
+    func testBackupCleanupLeavesUnrelatedFilesAndDirectoriesUntouched() throws {
+        let unrelated = directory.appendingPathComponent("preferences.json")
+        let invalidName = directory.appendingPathComponent("dismissed-corrupt-not-a-uuid.json")
+        let folder = directory.appendingPathComponent("dismissed-corrupt-\(UUID().uuidString).json")
+        let expired = directory.appendingPathComponent(
+            "dismissed-corrupt-\(UUID().uuidString).json")
+        try Data().write(to: unrelated)
+        try Data().write(to: invalidName)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        try Data().write(to: expired)
+        try FileManager.default.setAttributes(
+            [.modificationDate: now.addingTimeInterval(-8 * 86400)], ofItemAtPath: expired.path)
+        try DismissalStore(url: directory.appendingPathComponent("ledger.json")).load(now: now)
+        for file in [unrelated, invalidName, folder] {
+            XCTAssertTrue(FileManager.default.fileExists(atPath: file.path))
+        }
+        XCTAssertFalse(FileManager.default.fileExists(atPath: expired.path))
+    }
+
     func testWriteFailureStillSuppressesWithinProcess() throws {
         let blocker = directory.appendingPathComponent("not-a-directory")
         try Data().write(to: blocker)
         let store = DismissalStore(url: blocker.appendingPathComponent("ledger.json"))
         XCTAssertThrowsError(try store.dismiss(event(), now: now))
         XCTAssertTrue(store.dismissedIDs.contains(event().id))
+    }
+
+    func testExpiredEntriesAreRemovedFromDiskOnLoad() throws {
+        let url = directory.appendingPathComponent("ledger.json")
+        try DismissalStore(url: url).dismiss(event(), now: now)
+        let reloaded = DismissalStore(url: url)
+        try reloaded.load(now: now.addingTimeInterval(8 * 86400))
+        XCTAssertTrue(reloaded.dismissedIDs.isEmpty)
+        let saved = try JSONDecoder().decode(
+            [DismissalStore.Entry].self, from: Data(contentsOf: url))
+        XCTAssertTrue(saved.isEmpty)
+    }
+
+    func testFailedDismissalIsRetriedAfterStorageRecovers() throws {
+        let blocker = directory.appendingPathComponent("not-a-directory")
+        try Data().write(to: blocker)
+        let url = blocker.appendingPathComponent("ledger.json")
+        let store = DismissalStore(url: url)
+        XCTAssertThrowsError(try store.dismiss(event(), now: now))
+        try FileManager.default.removeItem(at: blocker)
+        // 予定や期限が変わらなくても、前回の書き込み失敗を再試行する。
+        try store.reconcile(events: [event()], now: now)
+        let reloaded = DismissalStore(url: url)
+        try reloaded.load(now: now)
+        XCTAssertTrue(reloaded.dismissedIDs.contains(event().id))
     }
 
     func testSettingsKeepSelectionAndPauseAcrossReload() throws {

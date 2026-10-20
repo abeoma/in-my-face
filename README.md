@@ -50,6 +50,8 @@ open -n .build/InMyFace/Build/Products/Debug/InMyFace.app --args --demo
 
 [最小リマインダーの確認結果と制限](docs/validation/minimal-reminder.md)を参照してください。
 
+個人利用ではmacOS Calendarの通常通知も併用してください。画面共有・投影・ユーザー切替の前にはメニューバーで一時停止し、利用へ戻ってから再開します。Dismissした会議を検索範囲（現在＋48時間）より先へ延期し、元の保存期限（最後に取得した終了から7日）を過ぎると再通知される場合があります。その場合は新しい日時で再度Dismissしてください。無期限の重複排除やロック状態での秘匿は保証しません。[コード・セキュリティレビューと対応](docs/validation/code-security-review.md)に残課題を記載しています。
+
 ## 検証アプリのビルドと起動
 
 開発基準はXcode 27.1（27A9275）、Swift 6.4、macOS SDK 27.0です。Deployment TargetはmacOS 14.0ですが、最小OSの実機確認は未実施です。外部依存やプロジェクト生成ツールは不要です。
