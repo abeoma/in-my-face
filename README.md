@@ -20,7 +20,35 @@
 
 ## 開発ステータス
 
-P0の技術検証段階です。`Prototypes/EventKitProbe/`に、カレンダー権限・選択日の予定・繰り返し回の識別情報を確認するmacOSアプリがあります。製品のメニューバー・通知・Join・永続化は未実装です。
+個人利用向けの最小実装があります。選択カレンダーの会議を1分前に画面ごとのアラートで表示し、Dismiss・Escで閉じられます。カレンダー選択・一時停止・Dismiss履歴はローカル保存します。通知時刻の変更・Join・通知音・ログイン時起動は未実装です。MVP全体は未完成です。
+
+## アプリのビルドと起動
+
+Xcode 27.1、Swift 6.4、macOS SDK 27.0を基準にします。Deployment TargetはmacOS 14.0で、最小OSの実機確認は未実施です。外部依存はありません。
+
+```sh
+xcodebuild -project InMyFace.xcodeproj -scheme InMyFace \
+  -configuration Debug -derivedDataPath .build/InMyFace build
+open .build/InMyFace/Build/Products/Debug/InMyFace.app
+```
+
+Apple Development署名を使う場合は、`Configuration/Signing.local.xcconfig.example`を`Configuration/Signing.local.xcconfig`へコピーし、`YOUR_TEAM_ID`を自分のTeam IDへ置き換えます。ローカル設定はGit管理外です。設定がない場合はAd Hoc署名です。Xcodeから実行する場合は`InMyFace.xcodeproj`を開き、InMyFace / My Macで⌘Rを使います。
+
+初回はアプリの説明を確認してカレンダーへのアクセスを許可し、通知するカレンダーを選択してください。EventKitProbeとは別のBundle IDなので、試作での許可は引き継ぎません。設定画面を閉じてもメニューバーに常駐し、一時停止・終了はメニューバーから操作できます。終了後に自動復活しません。
+
+```sh
+xcodebuild -project InMyFace.xcodeproj -scheme InMyFace \
+  -destination 'platform=macOS' -derivedDataPath .build/InMyFace test
+xcrun swift-format lint --strict --recursive InMyFace InMyFaceTests
+```
+
+カレンダーにアクセスせず画面を試すには、ビルド後に次を実行します。サンプル2件が起動約30秒後に通知され、履歴・設定は保存しません。通常版との同時起動は避けてください。
+
+```sh
+open -n .build/InMyFace/Build/Products/Debug/InMyFace.app --args --demo
+```
+
+[最小リマインダーの確認結果と制限](docs/validation/minimal-reminder.md)を参照してください。
 
 ## 検証アプリのビルドと起動
 
@@ -42,7 +70,7 @@ xcrun swift-format lint --strict --recursive Prototypes/EventKitProbe/Sources
 git diff --check
 ```
 
-整形は同じコマンドの`lint --strict`を`format --in-place`へ変更します。XCTestターゲットは未作成です。
+整形は同じコマンドの`lint --strict`を`format --in-place`へ変更します。試作にはXCTestターゲットはありません。製品のロジックテストは上記の`InMyFaceTests`で実行します。
 
 ## ドキュメント
 

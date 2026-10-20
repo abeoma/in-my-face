@@ -4,6 +4,8 @@
 
 CAL-01〜03、REL-04、NFR-01〜02の検証に用いる[EventKit検証アプリ](validation/eventkit-probe.md)があります。終日・例外回・識別子を表示する診断用UIであり、製品の受け入れ条件の達成を示すものではありません。製品の要件は以下のとおりです。
 
+`InMyFace.xcodeproj`の最小実装は、1分前通知・Dismiss・カレンダー選択・一時停止・処理済み履歴を提供します。ALT-01の他の通知分数、ALT-03のJoin・音、URL-01〜02、SET-01・NFR-04のログイン起動は未実装です。MVP全体の要件は変更せず、達成状況は[検証記録](validation/minimal-reminder.md)で管理します。
+
 ## 機能要件
 
 | ID | 優先度 | 要件・受け入れ条件 |
