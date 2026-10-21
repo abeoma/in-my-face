@@ -34,6 +34,17 @@ open .build/InMyFace/Build/Products/Debug/InMyFace.app
 
 Apple Development署名を使う場合は、`Configuration/Signing.local.xcconfig.example`を`Configuration/Signing.local.xcconfig`へコピーし、`YOUR_TEAM_ID`を自分のTeam IDへ置き換えます。ローカル設定はGit管理外です。設定がない場合はAd Hoc署名です。Xcodeから実行する場合は`InMyFace.xcodeproj`を開き、InMyFace / My Macで⌘Rを使います。
 
+### 普段使い用の配置・更新
+
+Xcodeの画面を開かずに、[配置スクリプト](scripts/install-local.sh)でReleaseビルドを`~/Applications/InMyFace.app`へ配置できます。ビルドには上記のXcodeが必要です。既存の`Configuration/Signing.local.xcconfig`を使用し、署名設定を変更しません。
+
+```sh
+./scripts/install-local.sh
+open "$HOME/Applications/InMyFace.app"
+```
+
+以後はFinderでホームフォルダーの「Applications」にある`InMyFace.app`を開けます。コードを更新したら、メニューバーからアプリを終了して同じスクリプトを再実行してください。配置コマンドは同時に実行せず、完了を待ってください。起動中は置換せず停止します。ビルド・コピー後の署名検証に成功してから旧アプリを置き換えます。置換失敗で旧アプリを元の場所へ戻せない場合は、削除せず保持先を表示します。その場所を確認して手動で復旧してください。アプリの置換では設定・Dismiss履歴を削除しません。ログイン時起動は、この配置先のアプリから登録してください。
+
 初回はアプリの説明を確認してカレンダーへのアクセスを許可し、通知するカレンダーを選択してください。EventKitProbeとは別のBundle IDなので、試作での許可は引き継ぎません。設定画面を閉じてもメニューバーに常駐し、一時停止・終了はメニューバーから操作できます。終了後に自動復活しません。
 
 ### ログイン時起動
@@ -90,3 +101,13 @@ git diff --check
 - [技術判断](docs/technical-decisions.md)：ADR、公式資料、制約と未決事項
 - [開発計画](docs/development-plan.md)：検証・実装順序と完了条件
 - [開発ガイド](AGENTS.md)：コーディングエージェント向け指針
+
+## アプリアイコン
+
+ベルと強調マークの[アプリアイコン](InMyFace/Resources/AppIcon.png)をFinder等で表示します。メニューバーは既存のSF Symbolを使用します。元画像・生成プロンプトと再生成方法は[アイコンの説明](InMyFace/Resources/AppIcon.md)を参照してください。
+
+```sh
+./scripts/generate-app-icon.sh
+```
+
+生成済みのICNSを同梱しており、通常のビルド・配置で再生成は不要です。[配置とアイコンの検証記録](docs/validation/local-install.md)に確認結果を記載しています。
