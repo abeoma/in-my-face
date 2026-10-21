@@ -15,6 +15,7 @@ final class AppLifecycleManager: ObservableObject {
     @Published private(set) var historyWarning: String?
 
     let alerts: AlertCoordinator
+    let loginItem: LoginItemService
     let isDemo: Bool
     private let calendar = CalendarService()
     private let settings = SettingsStore()
@@ -28,6 +29,7 @@ final class AppLifecycleManager: ObservableObject {
 
     init(isDemo: Bool = false) {
         self.isDemo = isDemo
+        loginItem = LoginItemService(isDemo: isDemo)
         // デモの架空IDが実会議と重なっても、外部URLを開かない。
         alerts = isDemo ? AlertCoordinator(openURL: { _ in true }) : AlertCoordinator()
         selectedIDs = isDemo ? ["demo"] : settings.calendarIDs
@@ -128,6 +130,7 @@ final class AppLifecycleManager: ObservableObject {
     }
 
     func refresh() {
+        loginItem.refresh()
         timer?.invalidate()
         timer = nil
         guard !suspension.isSuspended else { return }

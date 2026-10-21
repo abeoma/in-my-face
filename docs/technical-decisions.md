@@ -54,6 +54,8 @@
 - 状態：採用。
 - 判断：設定はUserDefaults、処理済み台帳はApplication SupportのJSON。ログイン起動は`SMAppService.mainApp`の登録・解除を使い、statusを表示する。
 - 根拠：SMAppServiceはmacOS 13以降の仕組みで、登録は利用者の承認に従う。[Apple：SMAppService](https://developer.apple.com/documentation/servicemanagement/smappservice)
+- 実装確認（2026-10-21）：SDKの`SMAppService.h`と[mainApp](https://developer.apple.com/documentation/servicemanagement/smappservice/mainapp)、[register()](https://developer.apple.com/documentation/servicemanagement/smappservice/register())、[unregister()](https://developer.apple.com/documentation/servicemanagement/smappservice/unregister())、[openSystemSettingsLoginItems()](https://developer.apple.com/documentation/servicemanagement/smappservice/opensystemsettingsloginitems())を確認。mainAppの解除は現在のアプリを終了させず、次回ログインの起動を解除する。実登録・実ログインは未確認。
+- 実装方針：登録状態はOSを正とし、起動時や承認待ちで自動登録しない。解除の完了まで新しい変更を受け付けず、失敗時もstatusを再取得する。デモの操作は無効にする。
 - 代替：独自LaunchAgent、特権ヘルパー、外部DBは不要。Boolean設定だけで登録成功を推定しない。
 - トレードオフ：OS設定で無効化され得る。自動起動は利用者のログイン時であり、OS起動直後や終了後の常時復活を意味しない。Joinを除く独自通信は不要とし、OSのカレンダー同期は制御対象外とする。
 

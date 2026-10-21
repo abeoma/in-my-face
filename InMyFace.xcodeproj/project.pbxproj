@@ -1,5 +1,13 @@
 // !$*UTF8*$!
 { archiveVersion = 1; classes = {}; objectVersion = 56; objects = {
+000000000000000000000097 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginItemService.swift; sourceTree = "<group>"; };
+000000000000000000000098 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginItemSettingsView.swift; sourceTree = "<group>"; };
+000000000000000000000099 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginItemServiceTests.swift; sourceTree = "<group>"; };
+00000000000000000000009A = { isa = PBXBuildFile; fileRef = 000000000000000000000097; };
+00000000000000000000009B = { isa = PBXBuildFile; fileRef = 000000000000000000000098; };
+00000000000000000000009C = { isa = PBXBuildFile; fileRef = 000000000000000000000097; };
+00000000000000000000009D = { isa = PBXBuildFile; fileRef = 000000000000000000000099; };
+
 000000000000000000000095 = { isa = PBXBuildFile; fileRef = 000000000000000000000074; };
 000000000000000000000096 = { isa = PBXBuildFile; fileRef = 000000000000000000000071; };
 000000000000000000000090 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingURLExtractor.swift; sourceTree = "<group>"; };
@@ -19,16 +27,16 @@
 00000000000000000000006D = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DismissalStore.swift"; sourceTree = "<group>"; };
 00000000000000000000006E = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReminderScheduler.swift"; sourceTree = "<group>"; };
 00000000000000000000006F = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsStore.swift"; sourceTree = "<group>"; };
-000000000000000000000070 = { isa = PBXGroup; path = "Services"; children = (000000000000000000000090, 00000000000000000000006C, 00000000000000000000006D, 00000000000000000000006E, 00000000000000000000006F); sourceTree = "<group>"; };
+000000000000000000000070 = { isa = PBXGroup; path = "Services"; children = (000000000000000000000097, 000000000000000000000090, 00000000000000000000006C, 00000000000000000000006D, 00000000000000000000006E, 00000000000000000000006F); sourceTree = "<group>"; };
 000000000000000000000071 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AlertView.swift"; sourceTree = "<group>"; };
 000000000000000000000072 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsView.swift"; sourceTree = "<group>"; };
-000000000000000000000073 = { isa = PBXGroup; path = "Views"; children = (000000000000000000000071, 000000000000000000000072); sourceTree = "<group>"; };
+000000000000000000000073 = { isa = PBXGroup; path = "Views"; children = (000000000000000000000098, 000000000000000000000071, 000000000000000000000072); sourceTree = "<group>"; };
 000000000000000000000074 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AlertCoordinator.swift"; sourceTree = "<group>"; };
 000000000000000000000075 = { isa = PBXGroup; path = "Windows"; children = (000000000000000000000074); sourceTree = "<group>"; };
 000000000000000000000076 = { isa = PBXGroup; path = "InMyFace"; children = (000000000000000000000066, 000000000000000000000068, 00000000000000000000006B, 000000000000000000000070, 000000000000000000000073, 000000000000000000000075); sourceTree = "<group>"; };
 000000000000000000000077 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PersistenceTests.swift"; sourceTree = "<group>"; };
 000000000000000000000078 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReminderSchedulerTests.swift"; sourceTree = "<group>"; };
-000000000000000000000079 = { isa = PBXGroup; path = "InMyFaceTests"; children = (000000000000000000000093, 000000000000000000000077, 000000000000000000000078); sourceTree = "<group>"; };
+000000000000000000000079 = { isa = PBXGroup; path = "InMyFaceTests"; children = (000000000000000000000099, 000000000000000000000093, 000000000000000000000077, 000000000000000000000078); sourceTree = "<group>"; };
 00000000000000000000007A = { isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Configuration/Build.xcconfig; sourceTree = "<group>"; };
 00000000000000000000007B = { isa = PBXBuildFile; fileRef = 000000000000000000000064; };
 00000000000000000000007C = { isa = PBXBuildFile; fileRef = 000000000000000000000065; };
@@ -53,10 +61,10 @@
 00000000000000000000000B = { isa = PBXNativeTarget; name = InMyFaceTests; productName = InMyFaceTests; productReference = 00000000000000000000000D; productType = "com.apple.product-type.bundle.unit-test"; buildConfigurationList = 00000000000000000000002A; buildPhases = (000000000000000000000017,000000000000000000000018,000000000000000000000019); buildRules = (); dependencies = (); };
 00000000000000000000000C = { isa = PBXFileReference; explicitFileType = wrapper.application; path = InMyFace.app; sourceTree = BUILT_PRODUCTS_DIR; };
 00000000000000000000000D = { isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = InMyFaceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-000000000000000000000014 = { isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (000000000000000000000091, 00000000000000000000007B, 00000000000000000000007C, 00000000000000000000007D, 00000000000000000000007E, 00000000000000000000007F, 000000000000000000000080, 000000000000000000000081, 000000000000000000000082, 000000000000000000000083, 000000000000000000000084); runOnlyForDeploymentPostprocessing = 0; };
+000000000000000000000014 = { isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (00000000000000000000009A, 00000000000000000000009B, 000000000000000000000091, 00000000000000000000007B, 00000000000000000000007C, 00000000000000000000007D, 00000000000000000000007E, 00000000000000000000007F, 000000000000000000000080, 000000000000000000000081, 000000000000000000000082, 000000000000000000000083, 000000000000000000000084); runOnlyForDeploymentPostprocessing = 0; };
 000000000000000000000015 = { isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 000000000000000000000016 = { isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
-000000000000000000000017 = { isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (000000000000000000000095, 000000000000000000000096, 000000000000000000000092, 000000000000000000000094, 000000000000000000000085, 000000000000000000000086, 000000000000000000000087, 000000000000000000000088, 000000000000000000000089, 00000000000000000000008A); runOnlyForDeploymentPostprocessing = 0; };
+000000000000000000000017 = { isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (00000000000000000000009C, 00000000000000000000009D, 000000000000000000000095, 000000000000000000000096, 000000000000000000000092, 000000000000000000000094, 000000000000000000000085, 000000000000000000000086, 000000000000000000000087, 000000000000000000000088, 000000000000000000000089, 00000000000000000000008A); runOnlyForDeploymentPostprocessing = 0; };
 000000000000000000000018 = { isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 000000000000000000000019 = { isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 000000000000000000000028 = { isa = XCConfigurationList; buildConfigurations = (000000000000000000000032, 000000000000000000000033); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
