@@ -20,6 +20,36 @@ struct AlertView: View {
                                 TimelineView(.periodic(from: .now, by: 1)) { context in
                                     Text(remaining(event: event, now: context.date)).font(.title3)
                                 }
+                                if !event.meetingLinks.isEmpty {
+                                    Picker(
+                                        "参加先",
+                                        selection: Binding(
+                                            get: {
+                                                coordinator.selectedLinks[event.id]
+                                                    ?? event.meetingLinks[0].url
+                                            },
+                                            set: { coordinator.selectedLinks[event.id] = $0 }
+                                        )
+                                    ) {
+                                        ForEach(
+                                            Array(event.meetingLinks.enumerated()),
+                                            id: \.element.url
+                                        ) { index, link in
+                                            Text(
+                                                "候補\(index + 1) — \(link.service) — \(link.host) — \(link.url.path)"
+                                            )
+                                            .tag(link.url)
+                                        }
+                                    }
+                                } else {
+                                    Text("対応する会議URLがありません").foregroundStyle(.secondary)
+                                }
+                                if let error = coordinator.joinErrors[event.id] {
+                                    Text(error).foregroundStyle(.orange)
+                                }
+                                Button("Join") { coordinator.join(event) }
+                                    .disabled(event.meetingLinks.isEmpty)
+                                    .accessibilityLabel("\(event.displayTitle)に参加")
                                 Button("Dismiss") { coordinator.onDismiss?(event) }
                                     .buttonStyle(.borderedProminent)
                                     .accessibilityLabel("\(event.displayTitle)を閉じる")

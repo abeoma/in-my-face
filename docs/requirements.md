@@ -4,7 +4,7 @@
 
 CAL-01〜03、REL-04、NFR-01〜02の検証に用いる[EventKit検証アプリ](validation/eventkit-probe.md)があります。終日・例外回・識別子を表示する診断用UIであり、製品の受け入れ条件の達成を示すものではありません。製品の要件は以下のとおりです。
 
-`InMyFace.xcodeproj`の最小実装は、1分前通知・Dismiss・カレンダー選択・一時停止・処理済み履歴を提供します。ALT-01の他の通知分数、ALT-03のJoin・音、URL-01〜02、SET-01・NFR-04のログイン起動は未実装です。MVP全体の要件は変更せず、達成状況は[検証記録](validation/minimal-reminder.md)で管理します。
+`InMyFace.xcodeproj`の最小実装は、1分前通知・Dismiss・カレンダー選択・一時停止・処理済み履歴・会議URL候補選択・Joinを提供します。ALT-01の他の通知分数、ALT-03の音、SET-01・NFR-04のログイン起動は未実装です。MVP全体の要件は変更せず、達成状況は[検証記録](validation/minimal-reminder.md)で管理します。
 
 REL-02の編集後の抑止は部分実装です。検索範囲外へ延期された回を再取得する前に元の履歴が期限切れになる場合は再表示します。[レビュー記録](validation/code-security-review.md)で未解決として管理し、個人利用では再Dismissで対応します。これはREL-02全体の合格を意味しません。
 
