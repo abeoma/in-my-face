@@ -4,6 +4,22 @@ struct OccurrenceKey: Hashable, Codable, Sendable {
     let calendarID: String
     let eventID: String
     let occurrenceDate: Date?
+
+    init(calendarID: String, eventID: String, occurrenceDate: Date?) {
+        self.calendarID = calendarID
+        self.eventID = eventID
+        self.occurrenceDate = occurrenceDate
+    }
+
+    /// 元の回日時がない繰り返しも取得結果に残し、開始日時で各回を分離する。
+    init(
+        calendarID: String, eventID: String, occurrenceDate: Date?,
+        isRecurring: Bool, start: Date
+    ) {
+        self.init(
+            calendarID: calendarID, eventID: eventID,
+            occurrenceDate: occurrenceDate ?? (isRecurring ? start : nil))
+    }
 }
 
 struct CalendarSnapshot: Identifiable, Equatable, Sendable {

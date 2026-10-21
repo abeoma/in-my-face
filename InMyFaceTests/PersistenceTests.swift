@@ -20,6 +20,36 @@ final class PersistenceTests: XCTestCase {
             isAllDay: false, isCancelled: false)
     }
 
+    func testRecurringWithoutOriginalDateKeepsOccurrencesIndependentAfterReload() throws {
+        func occurrence(start: Date) -> EventSnapshot {
+            EventSnapshot(
+                id: OccurrenceKey(
+                    calendarID: "calendar", eventID: "series", occurrenceDate: nil,
+                    isRecurring: true, start: start),
+                title: "recurring", start: start, end: start.addingTimeInterval(1800),
+                isAllDay: false, isCancelled: false)
+        }
+        let first = occurrence(start: now)
+        let second = occurrence(start: now.addingTimeInterval(86400))
+        let url = directory.appendingPathComponent("ledger.json")
+        try DismissalStore(url: url).dismiss(first, now: now)
+        let reloaded = DismissalStore(url: url)
+        try reloaded.load(now: now)
+        XCTAssertTrue(reloaded.dismissedIDs.contains(first.id))
+        XCTAssertFalse(reloaded.dismissedIDs.contains(second.id))
+    }
+
+    func testOriginalOccurrenceDateTakesPriorityOverMovedStart() {
+        let key = OccurrenceKey(
+            calendarID: "calendar", eventID: "series", occurrenceDate: now,
+            isRecurring: true, start: now.addingTimeInterval(3600))
+        XCTAssertEqual(key.occurrenceDate, now)
+        let single = OccurrenceKey(
+            calendarID: "calendar", eventID: "single", occurrenceDate: nil,
+            isRecurring: false, start: now)
+        XCTAssertNil(single.occurrenceDate)
+    }
+
     func testDismissedOccurrenceSurvivesReloadWithoutSavingTitle() throws {
         let url = directory.appendingPathComponent("ledger.json")
         let store = DismissalStore(url: url)
