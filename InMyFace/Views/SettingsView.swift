@@ -66,10 +66,11 @@ struct SettingsView: View {
                 Spacer()
                 Text("通知は1分前・音なし").font(.caption).foregroundStyle(.secondary)
             }
+            LoginItemSettingsView(service: model.loginItem)
             Text("ウィンドウを閉じてもメニューバーに常駐します。終了はメニューバーから。")
                 .font(.caption).foregroundStyle(.secondary)
         }
         .padding(24)
-        .frame(minWidth: 760, minHeight: 540)
+        .frame(minWidth: 760, minHeight: 620)
     }
 }
