@@ -37,11 +37,11 @@ final class CalendarService {
             // 単発の開始時刻編集ではキーを変えない。繰り返しは元の回日時で分離する。
             let recurring =
                 event.hasRecurrenceRules || event.isDetached || event.occurrenceDate != nil
-            guard !recurring || event.occurrenceDate != nil else { return nil }
             return EventSnapshot(
                 id: OccurrenceKey(
                     calendarID: calendar.calendarIdentifier, eventID: identifier,
-                    occurrenceDate: recurring ? event.occurrenceDate : nil),
+                    occurrenceDate: event.occurrenceDate,
+                    isRecurring: recurring, start: start),
                 title: event.title ?? "", start: start, end: end, isAllDay: event.isAllDay,
                 isCancelled: event.status == .canceled,
                 meetingLinks: MeetingURLExtractor.extract(

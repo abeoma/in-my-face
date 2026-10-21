@@ -49,6 +49,8 @@
 - レビュー後の判断（2026-10-20）：[screensDidWakeNotification](https://developer.apple.com/documentation/appkit/nsworkspace/screensdidwakenotification)と[sessionDidBecomeActiveNotification](https://developer.apple.com/documentation/appkit/nsworkspace/sessiondidbecomeactivenotification)は独立した復帰契機であり、画面復帰だけでセッションの停止理由を解除しない。履歴の書き込み失敗は再試行し、起動時の削除もディスクへ反映する。破損バックアップは最大1件・発見後7日までとする。
 - 保留：Dismiss後に現在＋48時間より先へ移動した回は、再取得前に最後に観測した終了＋7日の期限を迎えると履歴を失う。無期限保存は保持方針と矛盾し、全件取得は負荷を増やすため採用しない。対象指定取得の検証は配布前の課題とし、個人利用では再通知時に再Dismissする運用で扱う。REL-02は未合格の範囲を残す。
 
+- 取得欠落への対応（確認日：2026-10-21）：繰り返し・例外回の`occurrenceDate`がnilでも予定を除外せず、取得した開始日時を回キーの代替値にする。元日時がある場合はそちらを優先する。代替値を使う回は開始日時の変更後に再通知される可能性がある。[Apple：occurrenceDate](https://developer.apple.com/documentation/eventkit/ekevent/occurrencedate)は元日時の意味を示すが、代替値の選択はアプリの実装方針である。
+
 ## ADR-05：設定・ログイン起動・プライバシー
 
 - 状態：採用。
