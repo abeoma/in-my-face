@@ -1,5 +1,7 @@
 // !$*UTF8*$!
 { archiveVersion = 1; classes = {}; objectVersion = 56; objects = {
+00000000000000000000009E = { isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
+00000000000000000000009F = { isa = PBXBuildFile; fileRef = 00000000000000000000009E; };
 000000000000000000000097 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginItemService.swift; sourceTree = "<group>"; };
 000000000000000000000098 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginItemSettingsView.swift; sourceTree = "<group>"; };
 000000000000000000000099 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginItemServiceTests.swift; sourceTree = "<group>"; };
@@ -22,7 +24,7 @@
 000000000000000000000068 = { isa = PBXGroup; path = "Models"; children = (000000000000000000000067); sourceTree = "<group>"; };
 000000000000000000000069 = { isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "InMyFace.entitlements"; sourceTree = "<group>"; };
 00000000000000000000006A = { isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info.plist"; sourceTree = "<group>"; };
-00000000000000000000006B = { isa = PBXGroup; path = "Resources"; children = (000000000000000000000069, 00000000000000000000006A); sourceTree = "<group>"; };
+00000000000000000000006B = { isa = PBXGroup; path = "Resources"; children = (00000000000000000000009E, 000000000000000000000069, 00000000000000000000006A); sourceTree = "<group>"; };
 00000000000000000000006C = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CalendarService.swift"; sourceTree = "<group>"; };
 00000000000000000000006D = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DismissalStore.swift"; sourceTree = "<group>"; };
 00000000000000000000006E = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReminderScheduler.swift"; sourceTree = "<group>"; };
@@ -63,7 +65,7 @@
 00000000000000000000000D = { isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = InMyFaceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 000000000000000000000014 = { isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (00000000000000000000009A, 00000000000000000000009B, 000000000000000000000091, 00000000000000000000007B, 00000000000000000000007C, 00000000000000000000007D, 00000000000000000000007E, 00000000000000000000007F, 000000000000000000000080, 000000000000000000000081, 000000000000000000000082, 000000000000000000000083, 000000000000000000000084); runOnlyForDeploymentPostprocessing = 0; };
 000000000000000000000015 = { isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
-000000000000000000000016 = { isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+000000000000000000000016 = { isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (00000000000000000000009F); runOnlyForDeploymentPostprocessing = 0; };
 000000000000000000000017 = { isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (00000000000000000000009C, 00000000000000000000009D, 000000000000000000000095, 000000000000000000000096, 000000000000000000000092, 000000000000000000000094, 000000000000000000000085, 000000000000000000000086, 000000000000000000000087, 000000000000000000000088, 000000000000000000000089, 00000000000000000000008A); runOnlyForDeploymentPostprocessing = 0; };
 000000000000000000000018 = { isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 000000000000000000000019 = { isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
