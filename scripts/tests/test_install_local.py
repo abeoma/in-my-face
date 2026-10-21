@@ -26,9 +26,11 @@ class InstallLocalTests(unittest.TestCase):
 
     def run_scenario(self, scenario):
         source_path = pathlib.Path(__file__).resolve().parents[2] / "scripts/install-local.sh"
-        source = source_path.read_text().replace(
-            'app_dir="$HOME/Applications"', f'app_dir="{self.apps}"'
-        )
+        source = source_path.read_text()
+        destination = 'app_dir="$HOME/Applications"'
+        # 本体の書式変更で差し替えが外れても、実配置先には絶対に実行しない。
+        self.assertIn(destination, source)
+        source = source.replace(destination, f'app_dir="{self.apps}"')
         # 実ビルド・署名・プロセス確認を置換し、ファイル操作は一時領域で実行する。
         for original, replacement in [
             ("/usr/bin/xcodebuild", "fake_xcodebuild"),
@@ -36,6 +38,7 @@ class InstallLocalTests(unittest.TestCase):
             ("/usr/bin/pgrep", "fake_pgrep"),
             ("/usr/bin/ditto", "/bin/cp -R"),
         ]:
+            self.assertIn(original, source)
             source = source.replace(original, replacement)
         build_change = ""
         if scenario == "replacement":
