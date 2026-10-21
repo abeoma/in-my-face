@@ -14,7 +14,7 @@ final class AppLifecycleManager: ObservableObject {
     @Published private(set) var message = ""
     @Published private(set) var historyWarning: String?
 
-    let alerts = AlertCoordinator()
+    let alerts: AlertCoordinator
     let isDemo: Bool
     private let calendar = CalendarService()
     private let settings = SettingsStore()
@@ -28,6 +28,8 @@ final class AppLifecycleManager: ObservableObject {
 
     init(isDemo: Bool = false) {
         self.isDemo = isDemo
+        // デモの架空IDが実会議と重なっても、外部URLを開かない。
+        alerts = isDemo ? AlertCoordinator(openURL: { _ in true }) : AlertCoordinator()
         selectedIDs = isDemo ? ["demo"] : settings.calendarIDs
         isPaused = isDemo ? false : settings.isPaused
         let support = FileManager.default.urls(
@@ -142,7 +144,13 @@ final class AppLifecycleManager: ObservableObject {
                             calendarID: "demo", eventID: "sample-\($0.offset)", occurrenceDate: nil),
                         title: $0.element, start: demoStart,
                         end: demoStart.addingTimeInterval(1800),
-                        isAllDay: false, isCancelled: false)
+                        isAllDay: false, isCancelled: false,
+                        meetingLinks: $0.offset == 0
+                            ? MeetingURLExtractor.extract(
+                                url: nil,
+                                location:
+                                    "https://meet.google.com/abc-defg-hij https://zoom.us/j/123456789",
+                                notes: nil) : [])
                 }
         } else {
             authorization = calendar.authorization

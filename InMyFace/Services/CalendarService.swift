@@ -43,7 +43,9 @@ final class CalendarService {
                     calendarID: calendar.calendarIdentifier, eventID: identifier,
                     occurrenceDate: recurring ? event.occurrenceDate : nil),
                 title: event.title ?? "", start: start, end: end, isAllDay: event.isAllDay,
-                isCancelled: event.status == .canceled)
+                isCancelled: event.status == .canceled,
+                meetingLinks: MeetingURLExtractor.extract(
+                    url: event.url, location: event.location, notes: event.notes))
         }.sorted { $0.start < $1.start }
         guard authorization == .fullAccess else { return nil }
         return Result(calendars: calendarSnapshots, events: snapshots)

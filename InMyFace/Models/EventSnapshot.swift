@@ -19,6 +19,8 @@ struct EventSnapshot: Identifiable, Equatable, Sendable {
     let isAllDay: Bool
     let isCancelled: Bool
 
+    var meetingLinks: [MeetingLink] = []
+
     var reminderDate: Date { start.addingTimeInterval(-60) }
     var displayTitle: String { title.isEmpty ? "名称未設定" : title }
 }

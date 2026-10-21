@@ -7,15 +7,40 @@ final class AlertCoordinator: ObservableObject {
     @Published private(set) var events: [EventSnapshot] = []
     @Published var selectedID: OccurrenceKey?
     var onDismiss: ((EventSnapshot) -> Void)?
+    @Published private(set) var joinErrors: [OccurrenceKey: String] = [:]
+    @Published var selectedLinks: [OccurrenceKey: URL] = [:]
     private var panels: [AlertPanel] = []
+    private let openURL: (URL) -> Bool
 
-    func synchronize(_ events: [EventSnapshot]) {
+    init(openURL: @escaping (URL) -> Bool = { NSWorkspace.shared.open($0) }) {
+        self.openURL = openURL
+    }
+
+    func synchronize(_ events: [EventSnapshot], showsPanels: Bool = true) {
         self.events = events
+        let ids = Set(events.map(\.id))
+        joinErrors = joinErrors.filter { ids.contains($0.key) }
+        selectedLinks = selectedLinks.filter { key, url in
+            events.contains { $0.id == key && $0.meetingLinks.contains { $0.url == url } }
+        }
         if !events.contains(where: { $0.id == selectedID }) { selectedID = events.first?.id }
         if events.isEmpty {
             closePanels()
-        } else if panels.isEmpty {
+        } else if showsPanels && panels.isEmpty {
             rebuildPanels()
+        }
+    }
+
+    func join(_ event: EventSnapshot) {
+        guard let current = events.first(where: { $0.id == event.id }),
+            let url = selectedLinks[event.id] ?? current.meetingLinks.first?.url,
+            current.meetingLinks.contains(where: { $0.url == url })
+        else { return }
+        if openURL(url) {
+            joinErrors[event.id] = nil
+            onDismiss?(current)
+        } else {
+            joinErrors[event.id] = "会議URLを開けませんでした。もう一度Joinを押してください。"
         }
     }
 

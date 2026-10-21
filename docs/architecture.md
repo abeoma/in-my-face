@@ -1,6 +1,6 @@
 # アーキテクチャ
 
-本書は[要件](requirements.md)を満たす製品の実装方針です。`InMyFace.xcodeproj`に開始1分前通知・Dismissの最小実装があります。MeetingURLExtractor・音・ログイン起動は未実装です。独立したEventKit検証アプリを`Prototypes/EventKitProbe/`に配置しています。
+本書は[要件](requirements.md)を満たす製品の実装方針です。`InMyFace.xcodeproj`に開始1分前通知・Dismissの最小実装があります。MeetingURLExtractorとJoinを実装済みで、音・ログイン起動は未実装です。独立したEventKit検証アプリを`Prototypes/EventKitProbe/`に配置しています。
 
 最小実装はAppLifecycleManagerが具象サービスを組み立て、CalendarServiceの同期取得をMainActor上で直列実行します。ReminderSchedulerはDate・値型Snapshot・処理済みキー・有効状態だけから表示バッチと次期限を計算し、AppKitや実時計へ依存しません。次期限・表示中の終了時刻・30分の保守更新のうち最も早い時刻にTimerを1本設定し、発火時は再取得します。EventKit変更通知は500msで集約し、復帰・画面復帰・アクティブ化・日付・時計・タイムゾーン変更も再取得の契機とします。非同期取得・世代管理は未実装で、長時間の同期取得がUIを止める可能性は残っています。
 
@@ -95,3 +95,20 @@ Join成功はOSへのURLオープン要求が受理されたことを指し、�
 HTTPSのみを受け付け、URL構造をパースして正規化したホストと会議パスを検証します。Meetは`meet.google.com`、Zoomは`zoom.us`/`zoom.com`配下、Teamsは`teams.microsoft.com`/`teams.live.com`配下、Webexは`webex.com`配下を初期候補とします。サブドメインはドット境界で検証し、`zoom.us.example.com`やユーザー情報付きURLを拒否します。実際の対応ホスト・パスはP0で公開サンプルを基に固定し、任意文字列の部分一致や独自スキームは使いません。
 
 権限撤回時は取得・予約・表示を停止し、予定のメモリキャッシュを破棄します。取得失敗時は古い情報を「最新」と見せずエラー表示し、古いSnapshotから新規通知しません。再試行は1・5・15・30分の上限付きバックオフと手動再試行、復帰等の契機で行います。台帳破損は起動を妨げず、保証低下を明示して退避します。診断ログにはエラー種別と処理時間だけを記録します。
+
+### URL抽出の現在の対応範囲
+
+`MeetingURLExtractor`はURL→場所→メモの順でHTTPS候補を読み、同じURLを重複排除します。URL型の予定URLは文字列を補正せず検証します。場所・メモはHTMLの引用符と山括弧を区切りとして扱い、`&amp;`を復元します。クエリ・fragmentの末尾は変更しません。完全なHTML解析や短縮URL展開は行いません。候補はSnapshotに値として保持し、タイトル・メモ・URLを履歴へ保存しません。
+
+| サービス | 対応ホスト | 対応パス |
+| --- | --- | --- |
+| Google Meet | `meet.google.com` | `/abc-defg-hij`形式 |
+| Zoom | `zoom.us`・`zoom.com`とそのサブドメイン | `/j/数字`、`/my/名前` |
+| Microsoft Teams | `teams.microsoft.com`・`teams.live.com` | `/l/meetup-join/識別子/識別子`、`/meet/数字` |
+| Webex | `webex.com`とそのサブドメイン | `/meet/名前`、`/join/名前`、`/サイト/j.php` |
+
+ユーザー情報付きURL、HTTPS以外、443以外の明示ポート、偽装ホスト、表外のパスと制御文字を含むパスは拒否します。クエリは参加トークンを含む場合があるため表示・ログ出力せず、そのままOSへ渡します。Pickerには候補番号・サービス・ホスト・パスを表示します。同じパスでクエリだけが異なる候補は、抽出順に対応する番号で区別します。クエリ内容そのものから参加先を判別するUIは提供しません。
+
+JoinはMainActor上の同期`NSWorkspace.open(_:)`を使用します。戻り値がtrueなら既存のDismiss経路で履歴保存と全画面の更新を行います。falseなら表示と未処理状態を維持し、エラーと再試行を提供します。同期呼び出しのため要求処理中に別のJoin操作は実行されません。実サービスの入室成功は判定しません。
+
+場所・メモでは、参加トークン末尾の句読点と文章の区切りを完全には区別できません。利用時は予定URL欄、または空白で区切った裸のHTTPSリンクを優先し、参加先が不明な場合はCalendarの元の招待から参加します。デモではURLオープン成功を模擬し、外部URLを開きません。
