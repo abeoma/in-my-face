@@ -1,6 +1,6 @@
 # アーキテクチャ
 
-本書は[要件](requirements.md)を満たす製品の実装方針です。`InMyFace.xcodeproj`に開始1分前通知・Dismissの最小実装があります。MeetingURLExtractorとJoinを実装済みで、ログイン起動の登録・解除とOS状態表示を実装済みで、音は未実装です。独立したEventKit検証アプリを`Prototypes/EventKitProbe/`に配置しています。
+本書は[要件](requirements.md)を満たす製品の実装方針です。`InMyFace.xcodeproj`に開始1分前通知・Dismissの最小実装があります。MeetingURLExtractor・Join・ログイン起動の登録・解除とOS状態表示を実装済みで、音は未実装です。独立したEventKit検証アプリを`Prototypes/EventKitProbe/`に配置しています。
 
 最小実装はAppLifecycleManagerが具象サービスを組み立て、CalendarServiceの同期取得をMainActor上で直列実行します。ReminderSchedulerはDate・値型Snapshot・処理済みキー・有効状態だけから表示バッチと次期限を計算し、AppKitや実時計へ依存しません。次期限・表示中の終了時刻・30分の保守更新のうち最も早い時刻にTimerを1本設定し、発火時は再取得します。EventKit変更通知は500msで集約し、復帰・画面復帰・アクティブ化・日付・時計・タイムゾーン変更も再取得の契機とします。非同期取得・世代管理は未実装で、長時間の同期取得がUIを止める可能性は残っています。
 
@@ -118,6 +118,6 @@ JoinはMainActor上の同期`NSWorkspace.open(_:)`を使用します。戻り値
 
 MainActor上の`LoginItemService`が`SMAppService.mainApp`を操作し、`LoginItemSettingsView`がOSの状態を直接表示します。UserDefaultsに登録成功のBooleanは保存しません。スイッチは登録の有無（enabledまたはrequiresApproval）を表し、実際に起動可能かどうかは隣接する状態表示で区別します。notFoundと未知の状態も成功扱いにしません。
 
-登録・解除はユーザーの明示操作でのみ行い、起動・復帰・再評価ではOS状態の取得だけを行います。requiresApprovalに対して再登録せず、OS設定への明示的なボタンを提示します。解除はasync APIをawaitし、その間のスイッチ操作を無効化します。失敗後も実状態を再取得し、会議情報を含まない固定のエラー文を表示して再試行可能にします。
+登録・解除はユーザーの明示操作でのみ行い、起動・復帰・再評価ではOS状態の取得だけを行います。requiresApprovalに対して再登録せず、OS設定への明示的なボタンを提示します。解除はasync APIをawaitし、その間のスイッチ操作を無効化します。失敗後も実状態を再取得し、会議情報を含まない固定のエラー文を表示して再試行可能にします。OS設定からの復帰等で状態が変わった場合は過去の操作エラーを消し、状態が同じ場合は保持します。
 
 デモではOS状態の取得と登録・解除を行いません。ログイン時の起動も通常起動と同じウィンドウ表示を使い、終了後の常時復活や独自LaunchAgentは追加しません。継続して使う場所の署名済みアプリで登録し、移動・削除前には登録を解除します。

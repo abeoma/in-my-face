@@ -136,4 +136,72 @@ final class LoginItemServiceTests: XCTestCase {
         XCTAssertFalse(instance.isUpdating)
         XCTAssertEqual(instance.status, .notRegistered)
     }
+
+    func testExternalStatusChangeClearsOldErrorButUnchangedStatusKeepsIt() async {
+        let backend = Backend()
+        backend.fails = true
+        let service = service(backend)
+        await service.setEnabled(true)
+        service.refresh()
+        XCTAssertNotNil(service.errorMessage)
+        backend.status = .enabled
+        service.refresh()
+        XCTAssertEqual(service.status, .enabled)
+        XCTAssertNil(service.errorMessage)
+        XCTAssertEqual(backend.registrations, 1)
+    }
+
+    func testThrownRegistrationStillShowsOSApprovalState() async {
+        let backend = Backend()
+        let service = LoginItemService(
+            readStatus: { backend.status },
+            register: {
+                backend.status = .requiresApproval
+                throw TestError.failed
+            }, unregister: {})
+        await service.setEnabled(true)
+        XCTAssertEqual(service.status, .requiresApproval)
+        XCTAssertTrue(service.isRegistered)
+        XCTAssertNotNil(service.errorMessage)
+        XCTAssertFalse(service.isUpdating)
+    }
+
+    func testSuspendedUnregistrationBlocksChangesUntilCompletion() async {
+        let backend = Backend()
+        backend.status = .enabled
+        let started = expectation(description: "解除処理が中断された")
+        var resumeUnregistration: CheckedContinuation<Void, Never>?
+        let service = LoginItemService(
+            readStatus: { backend.status }, register: { try backend.register() },
+            unregister: {
+                // タイムアウト後にTaskが開始した場合は待機を作らない。
+                guard !Task.isCancelled else { return }
+                await withCheckedContinuation { continuation in
+                    resumeUnregistration = continuation
+                    started.fulfill()
+                }
+                try backend.unregister()
+            })
+        let operation = Task { await service.setEnabled(false) }
+        await fulfillment(of: [started], timeout: 2)
+        guard let continuation = resumeUnregistration else {
+            operation.cancel()
+            return
+        }
+        XCTAssertTrue(service.isUpdating)
+        backend.status = .requiresApproval
+        service.refresh()
+        XCTAssertEqual(service.status, .enabled)
+        await service.setEnabled(true)
+        XCTAssertEqual(backend.registrations, 0)
+        continuation.resume()
+        await operation.value
+        XCTAssertEqual(backend.unregistrations, 1)
+        XCTAssertEqual(service.status, .notRegistered)
+        XCTAssertFalse(service.isUpdating)
+        await service.setEnabled(true)
+        XCTAssertEqual(backend.registrations, 1)
+        XCTAssertEqual(service.status, .enabled)
+    }
+
 }

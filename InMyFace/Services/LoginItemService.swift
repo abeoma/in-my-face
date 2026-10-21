@@ -42,7 +42,10 @@ final class LoginItemService: ObservableObject {
 
     func refresh() {
         guard !isDemo, !isUpdating else { return }
-        status = readStatus()
+        let currentStatus = readStatus()
+        // OS設定で状態が変わった場合、過去の操作エラーを現在の失敗と誤認させない。
+        if currentStatus != status { errorMessage = nil }
+        status = currentStatus
     }
 
     func setEnabled(_ enabled: Bool) async {
